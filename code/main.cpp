@@ -1,4 +1,5 @@
 #include <iostream>
+#include "case.hpp"
 /**
 \file main.cpp
 \brief Fichier de lancement de l'application
@@ -11,4 +12,10 @@ int main ()
 {
     auto hello = []() { cout << "Vous etez bien en c++0X ou plus" << endl;};
     hello();
+
+    Case a("A"),b("b"),c("c");
+    a.addVoisin(b);
+    a.addVoisin(c);
+    for (auto& v: a)
+        cout << v.nom << endl;
 }
