@@ -1,2 +1,3 @@
-./doxygen/Doxyfile
-./TD_projet/*
+doxygen/Doxyfile
+TD_projet
+TD_projet/*
