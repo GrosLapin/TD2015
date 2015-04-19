@@ -28,34 +28,34 @@ struct is_iterator<T, typename std::enable_if<
 };
 
 
-template <class T, class U>
+template <class IteratorTemplate, class FoncteurTemplate>
 class FoncteurIterator
 {
 
     public:
         // on veux itérer sur une conteneur sans avoir a re-coder son comportement, du coup on le garde en
         // attribut et on l'intéroge à chaque opération.
-        FoncteurIterator(T a):  iterateur(a){
-            static_assert(is_iterator<T>::value,"Le type T doit etre un itérateur");
+        FoncteurIterator(IteratorTemplate a):  iterateur(a){
+            static_assert(is_iterator<IteratorTemplate>::value,"Le type T doit etre un itérateur");
         };
 
         // les méthodes ou on fait rien de particulier
         bool operator!=(FoncteurIterator &i2) const { return iterateur != i2.iterateur; }
         void operator++() { iterateur++; }
         void operator+=(int b) { iterateur += b; }
-        decltype(T()-T()) operator-(const FoncteurIterator &i2) const { return iterateur - i2.iterateur; }
+        decltype(IteratorTemplate()-IteratorTemplate()) operator-(const FoncteurIterator &i2) const { return iterateur - i2.iterateur; }
 
         // les méthodes qui utilisent les foncteurs
-        typename U::value_type& operator*() const {
-            return iterateur->get();
+        typename FoncteurTemplate::value_type& operator*() const {
+            return FoncteurTemplate()(*iterateur);
         }
-        typename U::value_type& operator->() {
+        typename FoncteurTemplate::value_type& operator->() {
             return operator*();
         }
 
 
     private :
-        T iterateur;
+        IteratorTemplate iterateur;
 };
 
 /**
