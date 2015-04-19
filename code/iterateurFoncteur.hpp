@@ -27,7 +27,6 @@ struct is_iterator<T, typename std::enable_if<
    static constexpr bool value = true;
 };
 
-
 template <class IteratorTemplate, class FoncteurTemplate>
 class FoncteurIterator
 {

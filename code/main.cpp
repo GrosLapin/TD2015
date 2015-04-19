@@ -9,6 +9,10 @@
 **/
 using namespace std;
 
+
+
+
+
 int main ()
 {
     auto hello = []() { cout << "Vous etez bien en c++0X ou plus" << endl;};
@@ -18,12 +22,21 @@ int main ()
     cout << "iterator " <<  is_iterator<vector<int>::iterator>::value << endl;
     cout << "int " <<  is_iterator<int>::value << endl;
     Case a,b,c,non;
+    a.addVoisin(b);
+    a.addVoisin(c);
+
     Terrain terrain;
-    terrain.addCase(a);
-    terrain.addCase(b);
+    terrain.addCase(Point2(1,2));
+    /*
+    terrain.addCase(Terrain<2>::Coordonnee(1,2));*/
 
 
-    cout << terrain.cases.size() << endl;
+
+/*    terrain.addCase(a);
+    terrain.addCase(b);*/
+
+
+  cout << terrain.cases.size() << endl;
 
 
 }
