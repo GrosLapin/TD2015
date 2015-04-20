@@ -18,28 +18,7 @@ int main ()
     auto hello = []() { cout << "Vous etez bien en c++0X ou plus" << endl;};
     hello();
 
-
-    cout << "iterator " <<  is_iterator<vector<int>::iterator>::value << endl;
-    cout << "int " <<  is_iterator<int>::value << endl;
-
-
-    Terrain terrain;
-    Case a(terrain),b(terrain),c(terrain),non(terrain);
-    a.addVoisin(b);
-
-    a.addVoisin(c);
-
-   // terrain.addCase(Point2(1,2));
-    /*
-    terrain.addCase(Terrain<2>::Coordonnee(1,2));*/
-
-
-
-/*    terrain.addCase(a);
-    terrain.addCase(b);*/
-
-
-//  cout << terrain.cases.size() << endl;
+    Terrain::test();
 
 
 }

@@ -16,6 +16,8 @@ class Case
 public :
 
     public :
+
+    friend void Terrain::test() ;
     Case(Terrain& unTerrain) : refTerrain(unTerrain) {}
 
 
