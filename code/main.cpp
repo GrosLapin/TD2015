@@ -21,13 +21,15 @@ int main ()
 
     cout << "iterator " <<  is_iterator<vector<int>::iterator>::value << endl;
     cout << "int " <<  is_iterator<int>::value << endl;
-    Case a,b,c,non;
+
+
+    Terrain terrain;
+    Case a(terrain),b(terrain),c(terrain),non(terrain);
     a.addVoisin(b);
 
     a.addVoisin(c);
 
-    Terrain terrain;
-    terrain.addCase(Point2(1,2));
+   // terrain.addCase(Point2(1,2));
     /*
     terrain.addCase(Terrain<2>::Coordonnee(1,2));*/
 
@@ -37,7 +39,7 @@ int main ()
     terrain.addCase(b);*/
 
 
-  cout << terrain.cases.size() << endl;
+//  cout << terrain.cases.size() << endl;
 
 
 }

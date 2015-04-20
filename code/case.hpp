@@ -6,7 +6,7 @@
 
 #include "iterateurFoncteur.hpp"
 #include "fonctionsConteneur.hpp"
-
+#include "terrain.hpp"
 /**
 \bug Les cases on comme voisin des references car elle ne gerent pas la mémoire
 La mémoire est geré par le terrain qui a un vecteur de case... you see my point ? :/
@@ -14,53 +14,79 @@ La mémoire est geré par le terrain qui a un vecteur de case... you see my point 
 class Case
 {
 public :
-     public :
 
-    using iterator = FoncteurIterator<std::vector<std::reference_wrapper<Case>>::iterator,UnWrappe<Case>>;
-    iterator begin() { return iterator(voisins.begin());}
-    iterator end() { return iterator(voisins.end());}
+    public :
+    Case(Terrain& unTerrain) : refTerrain(unTerrain) {}
+
 
     // si on a pas ça, on peut pas faire de find.
     inline bool operator==(const Case& autre ){
         return this == &autre;
     }
 
+
     inline void addVoisin(Case& voisin)
     {
+        // On passe la main à la fonction qui prend un int
+        int indice = refTerrain.get().getIndice(voisin);
+        addVoisin(indice);
+    };
+    inline void addVoisin(size_t indice)
+    {
+        size_t notreIndice = refTerrain.get().getIndice(*this);
+
         // vérification d'usage
-        if ( voisin == *this ) {
+        if ( indice == notreIndice ) {
             throw std::logic_error("Une case ne peut pas etre un de ses voisins");
         }
-        if ( contains(voisins,std::ref(voisin)) ){
+
+        if ( contains(voisins,indice)) {
             throw std::logic_error("Ajout d'un voisin deja présent dans la liste des voisins");
         }
+
         // 1) on reconnait cette case comme un voisin
-        voisins.push_back({voisin}) ;
+        voisins.push_back(indice) ;
         // 2) le voisin aussi
-        voisin.voisins.push_back({*this});
-    };
-
-
+        Case& voisin =refTerrain.get().getCase(indice);
+        voisin.voisins.push_back(notreIndice);
+    }
 
     inline void removeVoisin(Case& voisin)
     {
+        // On passe la main à la fonction qui prend un int
+        size_t indice = refTerrain.get().getIndice(voisin);
+        removeVoisin(indice);
+    }
+    inline void removeVoisin(size_t indice)
+    {
         // Dans un sens
-        auto position = std::find(voisins.begin(),voisins.end(),std::ref(voisin));
+        auto position = std::find(voisins.begin(),voisins.end(),indice);
         if ( position != voisins.end())
         {
             voisins.erase(position);
         }
 
         // et dans l'autre
-        position = std::find(voisin.voisins.begin(),voisin.voisins.end(),std::ref(*this));
+        size_t notreIndice = refTerrain.get().getIndice(*this);
+        Case& voisin = refTerrain.get().getCase(indice);
+
+        position = std::find(voisin.voisins.begin(),voisin.voisins.end(),notreIndice);
         if ( position != voisin.voisins.end())
         {
             voisin.voisins.erase(position);
         }
 
     };
+
+    /// TODO : reflechir si on veut iterer sur les indices ou sur les cases
+    // using iterator = FoncteurIterator<std::vector<std::reference_wrapper<Case>>::iterator,indiceToCase>;
+     using iterator =  std::vector<std::size_t>::iterator;
+    iterator begin() { return voisins.begin();}
+    iterator end() { return voisins.end();}
+
     private :
-        std::vector<std::reference_wrapper<Case>> voisins;
+        std::vector<std::size_t> voisins;
+        std::reference_wrapper<Terrain> refTerrain;
 };
 
 

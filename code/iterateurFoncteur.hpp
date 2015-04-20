@@ -6,6 +6,9 @@
 \class FoncteurIterator
 \brief Classe permétant d'ajouter une méthode dans le déférancement de l'itérateur
 \details Innitalement concus pour itérer sur un conteneur de ref_wrap sans avoir à faire le .get()
+
+TODO : REFACTORISER POUR QU'ON PUISSE UTILISER UN FONCTEUR DANS UNE STD::FONCTION ET PAS QUE UN TYPE
+CF : INDICE_TO_CASE
 */
 
 // tout ça c'est pour un static assert qui marche pas comme il devrait.
@@ -69,6 +72,17 @@ struct UnWrappe
     typedef T value_type;
     T& operator()(std::reference_wrapper<T> refWrap ) { return refWrap.get(); }
 };
+
+/**
+NE MARCHE PAS POUR L'INSTANT
+*//*
+template <class Terrain>
+struct indiceToCase
+{
+    std::reference_wrapper<Terrain> terrain;
+    indiceToCase(std::reference_wrapper<Terrain> monTerrain) : terrain(monTerrain) {}
+    Case& operator()(std::size_t indice) { return terrain.get().getCase(indice); }
+};*/
 
 // on a besoin de l'opérateur == pour faire des truc comme find sur un vecteur<wrap>
 // il faut aussi que T ait ==;
