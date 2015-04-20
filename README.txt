@@ -1,1 +1,2 @@
-Please checkout -b dev
+Please make
+git checkout dev
