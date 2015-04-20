@@ -23,6 +23,7 @@ int main ()
     cout << "int " <<  is_iterator<int>::value << endl;
     Case a,b,c,non;
     a.addVoisin(b);
+
     a.addVoisin(c);
 
     Terrain terrain;

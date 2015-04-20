@@ -30,12 +30,13 @@ struct is_iterator<T, typename std::enable_if<
 template <class IteratorTemplate, class FoncteurTemplate>
 class FoncteurIterator
 {
+    static_assert(is_iterator<IteratorTemplate>::value,"Le type T doit etre un itérateur");
 
     public:
         // on veux itérer sur une conteneur sans avoir a re-coder son comportement, du coup on le garde en
         // attribut et on l'intéroge à chaque opération.
         FoncteurIterator(IteratorTemplate a):  iterateur(a){
-            static_assert(is_iterator<IteratorTemplate>::value,"Le type T doit etre un itérateur");
+
         };
 
         // les méthodes ou on fait rien de particulier
@@ -45,10 +46,10 @@ class FoncteurIterator
         decltype(IteratorTemplate()-IteratorTemplate()) operator-(const FoncteurIterator &i2) const { return iterateur - i2.iterateur; }
 
         // les méthodes qui utilisent les foncteurs
-        typename FoncteurTemplate::value_type& operator*() const {
+        decltype(FoncteurTemplate()(*(IteratorTemplate())))& operator*() const {
             return FoncteurTemplate()(*iterateur);
         }
-        typename FoncteurTemplate::value_type& operator->() {
+        decltype(FoncteurTemplate()(*(IteratorTemplate())))& operator->() {
             return operator*();
         }
 
