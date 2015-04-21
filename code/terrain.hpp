@@ -88,9 +88,9 @@ class Terrain
         Terrain( std::function<std::vector<Point3>(Point3 point)> leCalculDesVoisins = calculeVoisinsExa ) : calculeVoisins(leCalculDesVoisins) {}
         // devrait etre const mais j'arrive pas a l'ecrire
         int getIndice(Case& uneCase);
-        Case& getCase(int indice);
+        Case& getCase(size_t indice);
         Case& getCase(Point3 coord);
-        inline Case& getCase(Point2 coord) { getCase(point3to2(coord)); };
+        inline Case& getCase(Point2 coord) { return getCase(point3to2(coord)); };
 
         // Le parcourt des cases
         using iterator = std::vector<Case>::iterator;

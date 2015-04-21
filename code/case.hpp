@@ -8,14 +8,26 @@
 #include "fonctionsConteneur.hpp"
 #include "terrain.hpp"
 /**
-\bug Les cases on comme voisin des references car elle ne gerent pas la mémoire
-La mémoire est geré par le terrain qui a un vecteur de case... you see my point ? :/
+\bug Ca serait bien puisque la case est lié au terrain qu'elle connaisse ses coordonnée ...
 */
 class Case
 {
 public :
 
     public :
+
+    /// Je suis pas sur de moi, mais j'ai l'impression qu'autoriser la copie peut nous mettre dedans
+        Case ( Case && quiVaMourir) : refTerrain(quiVaMourir.refTerrain){
+            voisins = std::move(quiVaMourir.voisins);
+        }
+        Case & operator= ( Case && quiVaMourir ) {
+            refTerrain = quiVaMourir.refTerrain;
+            voisins = std::move(quiVaMourir.voisins);
+            return *this;
+        }
+        Case(const Case&) = delete;
+        Case& operator=(const Case&) = delete;
+    /// fin pas sur
 
     friend void Terrain::test() ;
     Case(Terrain& unTerrain) : refTerrain(unTerrain) {}

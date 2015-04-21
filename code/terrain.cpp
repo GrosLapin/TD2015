@@ -12,9 +12,10 @@ int Terrain::getIndice(Case& uneCase)
 }
 
 
-Case& Terrain::getCase(int indice)
+Case& Terrain::getCase(size_t indice)
 {
-    if (indice < 0  || indice >= cases.size() ) {
+    //  comparison of unsigned expression < 0 is always false
+    if ( indice >= cases.size() ) {
         throw std::logic_error("Tentative de lire a un indice invalide dans Terrain.cases");
     }
     return cases[indice];
@@ -39,7 +40,7 @@ void Terrain::addCase (Point3 coord)
     }
 
     // 1 ) la creation de la case dans le vecteur
-    cases.push_back(Case(std::ref(*this)));
+    cases.emplace_back(std::ref(*this));
     Case& nouvelleCase = cases.back(); // Danger : ne prendre une ref qu'apres avoir modifier la liste
 
     // 2) le liens entre les coordonnée et la case
@@ -66,7 +67,7 @@ void Terrain::removeCase(Point3 coord)
     if ( contains(mapPoint3ToIndice,coord) )
     {
         // 1) chopé une ref sur la case a supprimer
-        int indice = mapPoint3ToIndice[coord];
+        size_t indice = mapPoint3ToIndice[coord];
         Case& aDelete = cases[indice];
 
         // 2) trouver tout ces voisins dans la grille
