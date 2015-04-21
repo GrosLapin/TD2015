@@ -19,9 +19,25 @@ class Dijkstra{
         CasePoids (const Case& c) :laCase(c),  poids(infranchissable-1) {}
     };
 
+
     const Terrain& terrain;
     std::vector<CasePoids> cases;
 
+        int poidsVoisinMin (CasePoids& uneCasePoids) {
+            int min = infranchissable;
+            for (const size_t& voisin : uneCasePoids.laCase )
+            {
+                int poidsVoisin = cases[voisin].poids;
+                if ( min > poidsVoisin )
+                {
+                    min = poidsVoisin;
+                }
+            }
+            return min;
+        }
+        void calculePoids (CasePoids& uneCasePoids) {
+          uneCasePoids.poids = poidsVoisinMin(uneCasePoids) + 1;
+        }
     inline void miseAjourCases()
     {
         cases.clear();
@@ -43,7 +59,24 @@ class Dijkstra{
         CasePoids& debut = cases[indiceDebut];
         debut.poids = 0 ;
 
-        std::vector<size_t> indiceAVisiter (debut.laCase.begin(), debut.laCase.end());
+        std::vector<size_t> vecIndiceAVisiter (debut.laCase.begin(), debut.laCase.end());
+
+        while ( ! vecIndiceAVisiter.empty() )
+        {
+            size_t indiceEnCour = vecIndiceAVisiter.back();
+            vecIndiceAVisiter.pop_back();
+
+            CasePoids& caseEnCour = cases[indiceEnCour];
+            calculePoids(caseEnCour);
+
+            for (size_t indice : caseEnCour.laCase )
+            {
+                if ( cases[indice].poids > caseEnCour.poids+1 )
+                {
+                    vecIndiceAVisiter.push_back(indice);
+                }
+            }
+        }
     }
     Dijkstra(const Terrain& leTerrain) : terrain(leTerrain){
 

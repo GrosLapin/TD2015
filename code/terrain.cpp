@@ -89,7 +89,13 @@ void Terrain::removeCase(Point3 coord)
             }
         }
 
-        // 3) gerer la suppression
+        // 3) - 1 ) mise a jours des indice
+        for (size_t i = indice ; i < cases.size() ; i++ )
+        {
+            cases[i].indice--;
+        }
+
+        //3 -2) gerer la suppression
         cases.erase(cases.begin()+indice);
         mapPoint3ToIndice.erase(coord);
 
@@ -179,7 +185,25 @@ void Terrain::test()
 
         }
 
-        /// TODO : test de suppression de case
+        cout << "Test de suppression de case" << endl;
+        test ( terrain.getIndice(terrain.getCase(Point2(0,0)))== 0 , "Tu as chier ton test");
+        terrain.removeCase(Point2(1,0));
+        size_t indice = terrain.getIndice(terrain.getCase(Point3(1,0,1)));
+        test ( indice == 1,  "Les cases apres la suppression doivent etre un crans plus bas doit etre : 1 est :"+  std_fix::to_string(indice));
+        indice = terrain.getIndice(terrain.getCase(Point3(0,0,1)));
+        test ( indice == 2,   "Les cases apres la suppression doivent etre un crans plus bas doit etre : 2 est :"+  std_fix::to_string( indice));
+        indice =  terrain.getIndice(terrain.getCase(Point3(1,1,1)));
+        test ( indice== 3, "Les cases apres la suppression doivent etre un crans plus bas doit etre : 3 est :"+  std_fix::to_string( indice));
+
+        execptionLevee = false;
+        try {terrain.getCase(Point3(1,0,0));}
+        catch (...) {execptionLevee = true;}
+        test (execptionLevee, "On ne devrait pas pouvoir aller à la case qui a etait delete ");
+
+        execptionLevee = false;
+        try {terrain.getCase(4);}
+        catch (...) {execptionLevee = true;}
+        test (execptionLevee, "On ne devrait pas pouvoir aller a l'indice 4 (taille du vecteur : " + std_fix::to_string(terrain.cases.size()));
     #endif
 }
 
