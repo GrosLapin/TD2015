@@ -11,43 +11,57 @@
 
 class Dijkstra{
 
-
     static const int infranchissable = std::numeric_limits<int>::max();
-    struct CasePoids {
+
+    // on a besoin de garder le distance de chaque case à l'origine
+    struct CaseDistance {
         const Case& laCase;
-        int poids;
-        CasePoids (const Case& c) :laCase(c),  poids(infranchissable-1) {}
+        int distance;
+        CaseDistance (const Case& c) :laCase(c),  distance(infranchissable-1) {}
     };
 
-
+    // Le terrain et Dijkstra on le meme ordre de case ce qui vos nous simplifier grandement la vie
     const Terrain& terrain;
-    std::vector<CasePoids> cases;
+    std::vector<CaseDistance> cases;
 
-        int poidsVoisinMin (CasePoids& uneCasePoids) {
-            int min = infranchissable;
-            for (const size_t& voisin : uneCasePoids.laCase )
+    int distanceVoisinMin (CaseDistance& uneCaseDistance)
+    {
+        int min = infranchissable;
+        for (const size_t& voisin : uneCaseDistance.laCase )
+        {
+            int distanceVoisin = cases[voisin].distance;
+            if ( min > distanceVoisin )
             {
-                int poidsVoisin = cases[voisin].poids;
-                if ( min > poidsVoisin )
-                {
-                    min = poidsVoisin;
-                }
+                min = distanceVoisin;
             }
-            return min;
         }
-        void calculePoids (CasePoids& uneCasePoids) {
-          uneCasePoids.poids = poidsVoisinMin(uneCasePoids) + 1;
-        }
-    inline void miseAjourCases()
+        return min;
+    }
+
+    /// Modification a faire ici pour tenir compte des cases infranchissable / poids des cases
+    /// Probleme : comment faire ça bien xD
+    void calculedistance (CaseDistance& uneCaseDistance) {
+          uneCaseDistance.distance = distanceVoisinMin(uneCaseDistance) + 1;
+    }
+
+    inline void synchronisationWithTerrain()
     {
         cases.clear();
         for (const Case& c : terrain)
         {
-            cases.push_back(CasePoids(c));
+            cases.push_back(CaseDistance(c));
         }
     }
+
     public :
+    size_t nextCase(size_t indiceDebut, size_t indiceFin ) {
+        ///TODO
+    }
     void calculChemin(size_t indiceDebut, size_t indiceFin )
+    {
+        /// Prendre dans l'autre sens et c'est reglé
+    }
+    void calculPoidsCases(size_t indiceDebut, size_t indiceFin )
     {
         // vérification
         if ( indiceDebut >= cases.size() || indiceFin >= cases.size() )
@@ -56,22 +70,22 @@ class Dijkstra{
         }
 
         // la case du debut vaut 0
-        CasePoids& debut = cases[indiceDebut];
-        debut.poids = 0 ;
+        CaseDistance& fin = cases[indiceFin];
+        fin.distance = 0 ;
 
-        std::vector<size_t> vecIndiceAVisiter (debut.laCase.begin(), debut.laCase.end());
+        std::vector<size_t> vecIndiceAVisiter (fin.laCase.begin(), fin.laCase.end());
 
         while ( ! vecIndiceAVisiter.empty() )
         {
             size_t indiceEnCour = vecIndiceAVisiter.back();
             vecIndiceAVisiter.pop_back();
 
-            CasePoids& caseEnCour = cases[indiceEnCour];
-            calculePoids(caseEnCour);
+            CaseDistance& caseEnCour = cases[indiceEnCour];
+            calculedistance(caseEnCour);
 
             for (size_t indice : caseEnCour.laCase )
             {
-                if ( cases[indice].poids > caseEnCour.poids+1 )
+                if ( cases[indice].distance > caseEnCour.distance+1 )
                 {
                     vecIndiceAVisiter.push_back(indice);
                 }
@@ -79,81 +93,10 @@ class Dijkstra{
         }
     }
     Dijkstra(const Terrain& leTerrain) : terrain(leTerrain){
-
-        // on recopi
-    }
-/*
-    struct CasePoint {
-        Case& laCase;
-        std::vector<CasePoint> voisin;
-
-        size_t point;
-        CasePoint(Case& uneCase) : laCase(uneCase) , point(0) {
-            mapIdRefCaseConcepte [getId(laCase)] = std::ref(laCase);
-
-            // je cr
-            for (auto& voisin : laCase){
-                voisin.emplace_back(voisin)
-            }
-        }*/
-};
-/*
-// il faudra surcharger cette methode
-template <class T, class Retour = std::reference_wrapper<T>>
-Retour getId(T& uneRef) { return std::ref(uneRef) ;  }
-// par exemple avec un truc du genre
-struct MaCase {
-    size_t getIndice() { static size_t indice =0 ; return indice++ ;};
-};
-template <>
-size_t getId<MaCase>(MaCase& uneRef) { return uneRef.getIndice(); }
-
-template <class CaseConcepte, class CoordConcepte>
-class Dijkstra{
-
-    using TypeIdentifiant = decltype(getId(std::declval<CaseConcepte>()) );
-
-    // La je fais un truc generique avec une map (pour que ça soit simple au debut pour moi)
-    // a regarder si un version spécialisé pour MES Cases serais pas plus performant
-    std::map<TypeIdentifiant,std::reference_wrapper<CaseConcepte>> mapIdRefCaseConcepte;
-
-
-    struct CasePoint {
-        CaseConcepte& laCase;
-        std::vector<CasePoint> voisin;
-
-        size_t point;
-        CasePoint(CaseConcepte& uneCase) : laCase(uneCase) , point(0) {
-            mapIdRefCaseConcepte [getId(laCase)] = std::ref(laCase);
-
-            // je cr
-            for (auto& voisin : laCase){
-                voisin.emplace_back(voisin)
-            }
-        }
-
-        CasePoint(CaseConcepte& uneCase) : laCase(uneCase) , point(0) {
-            mapIdRefCaseConcepte [getId(laCase)] = std::ref(laCase);
-        }
-    };
-    bool invalide;
-
-    // a reflechir
-    CaseConcepte& debut, fin;
-
-    public :
-    Dijkstra (CaseConcepte& leDebut,CaseConcepte& laFin) : debut(leDebut), fin(laFin) , invalide(false) {
-        calculChemin();
+        synchronisationWithTerrain();
     }
 
-    void calculChemin()
-    {
-        std::vector<CasePoint> chemin;
-        chemin.push_back({debut});
-
-        int distance = 1;
-    }
 
 };
-*/
+
 #endif // DIJKSTRA_HPP
