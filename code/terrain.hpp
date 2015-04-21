@@ -85,6 +85,8 @@ class Terrain
 {
     public :
 
+        bool operator == (const Terrain& other ) const { return &other == this; };
+        bool operator != (const Terrain& other ) const { return !operator==(other); };
         Terrain( std::function<std::vector<Point3>(Point3 point)> leCalculDesVoisins = calculeVoisinsExa ) : calculeVoisins(leCalculDesVoisins) {}
         // devrait etre const mais j'arrive pas a l'ecrire
         int getIndice(Case& uneCase);
@@ -94,8 +96,13 @@ class Terrain
 
         // Le parcourt des cases
         using iterator = std::vector<Case>::iterator;
+        using const_iterator = std::vector<Case>::const_iterator;
+
         inline iterator begin() { return cases.begin(); }
+        inline const_iterator begin() const { return cases.begin(); }
+
         inline iterator end() { return cases.end(); }
+        inline const_iterator end() const{ return cases.end(); }
 
         void addCase (Point3 coord);
         inline void addCase (Point2 coord) { addCase(point3to2(coord)); }

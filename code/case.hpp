@@ -19,18 +19,20 @@ public :
     /// Je suis pas sur de moi, mais j'ai l'impression qu'autoriser la copie peut nous mettre dedans
         Case ( Case && quiVaMourir) : refTerrain(quiVaMourir.refTerrain){
             voisins = std::move(quiVaMourir.voisins);
+            indice = std::move(quiVaMourir.indice);
+            coordonnees = std::move(quiVaMourir.coordonnees);
         }
         Case & operator= ( Case && quiVaMourir ) {
             refTerrain = quiVaMourir.refTerrain;
             voisins = std::move(quiVaMourir.voisins);
+            indice = std::move(quiVaMourir.indice);
+            coordonnees = std::move(quiVaMourir.coordonnees);
             return *this;
         }
         Case(const Case&) = delete;
         Case& operator=(const Case&) = delete;
     /// fin pas sur
 
-    friend void Terrain::test() ;
-    Case(Terrain& unTerrain) : refTerrain(unTerrain) {}
 
 
     // si on a pas ça, on peut pas faire de find.
@@ -94,13 +96,27 @@ public :
 
     /// TODO : reflechir si on veut iterer sur les indices ou sur les cases
     // using iterator = FoncteurIterator<std::vector<std::reference_wrapper<Case>>::iterator,indiceToCase>;
-     using iterator =  std::vector<std::size_t>::iterator;
+    using iterator =  std::vector<std::size_t>::iterator;
+    using const_iterator =  std::vector<std::size_t>::const_iterator;
     iterator begin() { return voisins.begin();}
+    const_iterator begin() const { return voisins.begin();}
     iterator end() { return voisins.end();}
+    const_iterator end() const { return voisins.end();}
 
     private :
+
+        friend class Terrain ;    // je veux que : Terrain puisse me tester
+        // je veux que le terrain soit le seul a créer des cases.
+        Case(Terrain& unTerrain,size_t id,Point3 coord) :
+            refTerrain(unTerrain) ,
+            indice(id),
+            coordonnees(coord)
+            {}
+
         std::vector<std::size_t> voisins;
         std::reference_wrapper<Terrain> refTerrain;
+        size_t indice;
+        Point3 coordonnees;
 };
 
 

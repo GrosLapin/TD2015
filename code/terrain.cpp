@@ -3,12 +3,15 @@
 
 int Terrain::getIndice(Case& uneCase)
 {
-    if ( ! contains (cases,uneCase) )
+    // AVANT : if ( ! contains (cases,uneCase) )  => est-ce equivalant ?
+    // Une case est forcement dans un terrain.
+    // Si c'est le bon terrain alors ce terrain connais cette case
+    if ( uneCase.refTerrain.get() != (*this) )
     {
         throw std::logic_error("Recherche de l'indice d'une case qui n'est pas dans se terrain");
     }
 
-    return std::find(cases.begin(),cases.end(),uneCase) - cases.begin();
+    return uneCase.indice;
 }
 
 
@@ -40,7 +43,10 @@ void Terrain::addCase (Point3 coord)
     }
 
     // 1 ) la creation de la case dans le vecteur
-    cases.emplace_back(std::ref(*this));
+    /// Note, on doit crée la Case ici puis la bouger car seul Terrain peut créer des case
+    cases.emplace_back(std::move(Case(*this, // la ref sur le terrain
+                                      cases.size(), // comme on ajoute à la fin, la taille now c'est l'indice de la case
+                                      coord)));
     Case& nouvelleCase = cases.back(); // Danger : ne prendre une ref qu'apres avoir modifier la liste
 
     // 2) le liens entre les coordonnée et la case

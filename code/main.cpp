@@ -1,12 +1,14 @@
 #include <iostream>
 #include "case.hpp"
 #include "terrain.hpp"
+#include "dijkstra.hpp"
 /**
 \file main.cpp
 \brief Fichier de lancement de l'application
 \author Martin M
 \bug Soon :D
-**/
+*/
+
 using namespace std;
 
 
