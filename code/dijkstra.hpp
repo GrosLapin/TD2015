@@ -12,20 +12,24 @@
 class Dijkstra{
 
     static const int infranchissable = std::numeric_limits<int>::max();
+    static const int notVisited = std::numeric_limits<int>::max()-1;
 
     // on a besoin de garder le distance de chaque case à l'origine
     struct CaseDistance {
         const Case& laCase;
         int distance;
-        CaseDistance (const Case& c) :laCase(c),  distance(infranchissable-1) {}
+        CaseDistance (const Case& c) :laCase(c),  distance(notVisited) {}
     };
 
     // Le terrain et Dijkstra on le meme ordre de case ce qui vos nous simplifier grandement la vie
     const Terrain& terrain;
     std::vector<CaseDistance> cases;
-
+    std::vector<std::size_t> indiceChemin;
     int distanceVoisinMin (CaseDistance& uneCaseDistance)
     {
+        if (uneCaseDistance.laCase.haveVoisins()) {
+            throw std::logic_error("Recherche d'un voisin sur une cases sans voisin");
+        }
         int min = infranchissable;
         for (const size_t& voisin : uneCaseDistance.laCase )
         {
@@ -37,6 +41,24 @@ class Dijkstra{
         }
         return min;
     }
+    size_t indiceVoisinDistanceMin(CaseDistance& uneCaseDistance)
+    {
+        if (uneCaseDistance.laCase.haveVoisins()) {
+            throw std::logic_error("Recherche d'un voisin sur une cases sans voisin");
+        }
+        size_t indice = uneCaseDistance.laCase.getIndice();
+        int min = infranchissable;
+        for (const size_t& voisin : uneCaseDistance.laCase )
+        {
+            int distanceVoisin = cases[voisin].distance;
+            if ( min > distanceVoisin )
+            {
+                min = distanceVoisin;
+                indice = cases[voisin].laCase.getIndice();
+            }
+        }
+        return indice;
+    }
 
     /// Modification a faire ici pour tenir compte des cases infranchissable / poids des cases
     /// Probleme : comment faire ça bien xD
@@ -44,6 +66,13 @@ class Dijkstra{
           uneCaseDistance.distance = distanceVoisinMin(uneCaseDistance) + 1;
     }
 
+    void checkInput(size_t indiceDebut, size_t indiceFin ){
+        // vérification
+        if ( indiceDebut >= cases.size() || indiceFin >= cases.size() )
+        {
+            throw std::logic_error("Indice hors tableau dans le calcul de chemin");
+        }
+    }
     inline void synchronisationWithTerrain()
     {
         cases.clear();
@@ -59,15 +88,29 @@ class Dijkstra{
     }
     void calculChemin(size_t indiceDebut, size_t indiceFin )
     {
-        /// Prendre dans l'autre sens et c'est reglé
+        // comme d'ab
+        checkInput(indiceDebut,indiceFin);
+        indiceChemin.clear();
+
+        // si le debut n'est pas visité c'est qu'il y a pas de chemin
+        CaseDistance& debut = cases[indiceDebut];
+        if (debut.distance == notVisited ) {
+            return;
+        }
+
+        indiceChemin.push_back(indiceFin);
+
+        while(cases[indiceChemin.back()].laCase.getIndice() != indiceDebut)
+        {
+            indiceChemin.push_back(indiceVoisinDistanceMin(cases[indiceChemin.back()]));
+        }
+
+        /// A vérifier mais à priorie on veut pas que le debut soit dans le chemin
+        indiceChemin.pop_back();
     }
     void calculPoidsCases(size_t indiceDebut, size_t indiceFin )
     {
-        // vérification
-        if ( indiceDebut >= cases.size() || indiceFin >= cases.size() )
-        {
-            throw std::logic_error("Indice hors tableau dans le calcul de chemin");
-        }
+        checkInput(indiceDebut,indiceFin);
 
         // la case du debut vaut 0
         CaseDistance& fin = cases[indiceFin];

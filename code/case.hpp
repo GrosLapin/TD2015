@@ -40,7 +40,8 @@ public :
         return this == &autre;
     }
 
-
+    inline size_t getIndice() const {return indice;}
+    inline bool haveVoisins() const { return !voisins.empty();}
     inline void addVoisin(Case& voisin)
     {
         // On passe la main à la fonction qui prend un int
