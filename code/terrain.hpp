@@ -32,10 +32,16 @@ namespace std_fix {
 namespace boost {
     namespace geometry {
         namespace model {
+            /// DANGER : mieux a faire ?
             // la fonction à pas vraiment de sens en terme de comparaison.
             // il faut plus voir ça comme une fonction de hash
             inline bool operator < (const Point3& un, const Point3& deux){
-                return un.get<0>()*1024+un.get<1>()*256+un.get<2>() < deux.get<0>()*1024+deux.get<1>()*256+deux.get<2>();
+                return un.get<0>()*1000000+
+                       un.get<1>()*1000+
+                       un.get<2>()      <
+                       deux.get<0>()*1000000+
+                       deux.get<1>()*1000+
+                       deux.get<2>();
             }
 
             inline std::string to_string (const Point3& point) {
@@ -105,6 +111,7 @@ class Terrain
         inline const_iterator end() const{ return cases.end(); }
 
         void addCase (Point3 coord);
+        inline void addCase (int x, int y, int z = 0) {addCase(Point3(x,y,z)); }
         inline void addCase (Point2 coord) { addCase(point3to2(coord)); }
 
         void removeCase(Point3 coord);

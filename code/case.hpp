@@ -41,6 +41,7 @@ public :
     }
 
     inline size_t getIndice() const {return indice;}
+    inline Point3 getCoordonnees() const {return coordonnees;}
     inline bool haveVoisins() const { return !voisins.empty();}
     inline void addVoisin(Case& voisin)
     {

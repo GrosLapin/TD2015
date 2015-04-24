@@ -39,7 +39,11 @@ void Terrain::addCase (Point3 coord)
     // l'ajouts d'une case doit se faire sur un case vide :D
     if ( contains(mapPoint3ToIndice,coord) ) {
         // pb de tostring avec ("+coord.get<0>()+","+coord.get<1>()+","+coord.get<2>()+")
-        throw std::logic_error ("Ajout de la coordonnee alors que celle ci existe deja");
+        for (auto& p : mapPoint3ToIndice)
+        {
+            std::cout << p.first << " => "<<p.second << std::endl;
+        }
+        throw std::logic_error ("Ajout de la coordonnee alors que celle ci existe deja : "+std_fix::to_string(coord));
     }
 
     // 1 ) la creation de la case dans le vecteur

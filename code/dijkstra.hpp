@@ -23,12 +23,14 @@ class Dijkstra{
 
     // Le terrain et Dijkstra on le meme ordre de case ce qui vos nous simplifier grandement la vie
     const Terrain& terrain;
+    bool aVerifier;
     std::vector<CaseDistance> cases;
     std::vector<std::size_t> indiceChemin;
     int distanceVoisinMin (CaseDistance& uneCaseDistance)
     {
-        if (uneCaseDistance.laCase.haveVoisins()) {
-            throw std::logic_error("Recherche d'un voisin sur une cases sans voisin");
+        if (! uneCaseDistance.laCase.haveVoisins()) {
+             throw std::logic_error("distanceVoisinMin : Recherche d'un voisin sur une cases sans voisin: "
+                + std_fix::to_string(uneCaseDistance.laCase.getCoordonnees()));
         }
         int min = infranchissable;
         for (const size_t& voisin : uneCaseDistance.laCase )
@@ -43,8 +45,9 @@ class Dijkstra{
     }
     size_t indiceVoisinDistanceMin(CaseDistance& uneCaseDistance)
     {
-        if (uneCaseDistance.laCase.haveVoisins()) {
-            throw std::logic_error("Recherche d'un voisin sur une cases sans voisin");
+        if ( ! uneCaseDistance.laCase.haveVoisins()) {
+            throw std::logic_error("indiceVoisinDistanceMin : Recherche d'un voisin sur une cases sans voisin: "
+                + std_fix::to_string(uneCaseDistance.laCase.getCoordonnees()));
         }
         size_t indice = uneCaseDistance.laCase.getIndice();
         int min = infranchissable;
@@ -59,6 +62,27 @@ class Dijkstra{
         }
         return indice;
     }
+
+    size_t indiceCaseSuivanteDansChemin(CaseDistance& uneCaseDistance)
+    {
+        if ( ! uneCaseDistance.laCase.haveVoisins()) {
+            throw std::logic_error("indiceVoisinDistanceMin : Recherche d'un voisin sur une cases sans voisin: "
+                + std_fix::to_string(uneCaseDistance.laCase.getCoordonnees()));
+        }
+        size_t indice = uneCaseDistance.laCase.getIndice();
+        int min = infranchissable;
+        for (const size_t& voisin : uneCaseDistance.laCase )
+        {
+            int distanceVoisin = cases[voisin].distance;
+            if ( min > distanceVoisin && distanceVoisin > uneCaseDistance.distance )
+            {
+                min = distanceVoisin;
+                indice = cases[voisin].laCase.getIndice();
+            }
+        }
+        return indice;
+    }
+
 
     /// Modification a faire ici pour tenir compte des cases infranchissable / poids des cases
     /// Probleme : comment faire ça bien xD
@@ -83,8 +107,59 @@ class Dijkstra{
     }
 
     public :
-    size_t nextCase(size_t indiceDebut, size_t indiceFin ) {
-        ///TODO
+    static void test (){
+        using namespace std;
+        Terrain terrain;
+        terrain.addCase(0,0);   //0
+        terrain.addCase(0,1);   //1
+        terrain.addCase(0,2);   //2
+        terrain.addCase(0,3);   //3
+        terrain.addCase(0,4);   //4
+
+        terrain.addCase(1,0);   //5
+        terrain.addCase(2,0);   //6
+        terrain.addCase(3,0);   //7
+        terrain.addCase(4,0);   //8
+
+        terrain.addCase(4,1);   //9
+        terrain.addCase(4,2);   //10
+        terrain.addCase(4,3);   //11
+        terrain.addCase(4,4);   //12
+
+        terrain.addCase(3,4);   //13
+        terrain.addCase(2,4);   //14
+        terrain.addCase(1,4);   //15
+
+        Dijkstra dij(terrain);
+        size_t indice = dij.indiceProchaineCase (0,12);
+
+        cout << "La permiere case pour allée en 4 , 4 est : "<<indice << endl;
+        cout << " il faudra : " << dij.indiceChemin.size() << " pour y aller"<< endl;
+
+    }
+    size_t indiceProchaineCase(size_t indiceDebut, size_t indiceFin ) {
+        if (aVerifier)
+        {
+            using namespace std;
+            synchronisationWithTerrain();
+            cout << "synchronisationWithTerrain fait" <<  endl;
+            calculPoidsCases(indiceDebut,indiceFin);
+            cout << "calculPoidsCases fait" <<  endl;
+            calculChemin(indiceDebut,indiceFin);
+            cout << "calculChemin" <<  endl;
+            aVerifier =false;
+        }
+        // si on a pas de chemin ou retourne la case de debut
+        // Todo : reflechir a une autre solution ? -1 / execption
+        if (indiceChemin.empty())
+        {
+            return indiceDebut;
+        }
+        return indiceChemin.back();
+    }
+    void retirerPremiereCase()
+    {
+        indiceChemin.pop_back();
     }
     void calculChemin(size_t indiceDebut, size_t indiceFin )
     {
@@ -99,10 +174,13 @@ class Dijkstra{
         }
 
         indiceChemin.push_back(indiceFin);
-
         while(cases[indiceChemin.back()].laCase.getIndice() != indiceDebut)
         {
-            indiceChemin.push_back(indiceVoisinDistanceMin(cases[indiceChemin.back()]));
+            std::cout << cases[indiceChemin.back()].laCase.getCoordonnees() << " distance : "<<cases[indiceChemin.back()].distance <<std::endl;
+            int indice = indiceCaseSuivanteDansChemin(cases[indiceChemin.back()]);
+            std::cout << cases[indice].laCase.getCoordonnees() << " distance : "<<cases[indice].distance  <<std::endl;
+            indiceChemin.push_back(indiceCaseSuivanteDansChemin(cases[indiceChemin.back()]));
+
         }
 
         /// A vérifier mais à priorie on veut pas que le debut soit dans le chemin
@@ -135,8 +213,8 @@ class Dijkstra{
             }
         }
     }
-    Dijkstra(const Terrain& leTerrain) : terrain(leTerrain){
-        synchronisationWithTerrain();
+    Dijkstra(const Terrain& leTerrain) : terrain(leTerrain), aVerifier(true){
+
     }
 
 
