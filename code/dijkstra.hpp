@@ -6,7 +6,7 @@
 #include <limits>
 
 #include "terrain.hpp"
-
+#include "fonctionTest/test.hpp"
 // Version vraiment pas modulable :D
 
 class Dijkstra{
@@ -131,10 +131,15 @@ class Dijkstra{
         terrain.addCase(1,4);   //15
 
         Dijkstra dij(terrain);
-        size_t indice = dij.indiceProchaineCase (0,12);
+        size_t indiceNext = dij.indiceProchaineCase (terrain.getIndice(terrain.getCase(0,0)),
+                                                 terrain.getIndice(terrain.getCase(4,4)));
+        size_t indiceSolution1 = terrain.getIndice(terrain.getCase(0,1));
+        size_t indiceSolution2 = terrain.getIndice(terrain.getCase(1,0));
 
-        cout << "La permiere case pour allée en 4 , 4 est : "<<indice << endl;
-        cout << " il faudra : " << dij.indiceChemin.size() << " pour y aller"<< endl;
+        cout << "Debut test dijkstra" << endl;
+        testUnitaire((indiceNext == indiceSolution1 || indiceNext == indiceSolution2), "La case suivante doit etre 0,1 ou 1,0");
+        testUnitaire(dij.indiceChemin.size() == 8, "Le chemin dois se faire en 8 coups pas en " + std_fix::to_string(dij.indiceChemin.size()));
+        cout << "fin test dijkstra" << endl;
 
     }
     size_t indiceProchaineCase(size_t indiceDebut, size_t indiceFin ) {
@@ -142,11 +147,8 @@ class Dijkstra{
         {
             using namespace std;
             synchronisationWithTerrain();
-            cout << "synchronisationWithTerrain fait" <<  endl;
             calculPoidsCases(indiceDebut,indiceFin);
-            cout << "calculPoidsCases fait" <<  endl;
             calculChemin(indiceDebut,indiceFin);
-            cout << "calculChemin" <<  endl;
             aVerifier =false;
         }
         // si on a pas de chemin ou retourne la case de debut

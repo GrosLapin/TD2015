@@ -1,7 +1,8 @@
 #include "terrain.hpp"
 #include "case.hpp"
+#include "fonctionTest/test.hpp"
 
-int Terrain::getIndice(Case& uneCase)
+int Terrain::getIndice(const Case& uneCase) const
 {
     // AVANT : if ( ! contains (cases,uneCase) )  => est-ce equivalant ?
     // Une case est forcement dans un terrain.
@@ -15,22 +16,22 @@ int Terrain::getIndice(Case& uneCase)
 }
 
 
-Case& Terrain::getCase(size_t indice)
+ Case& Terrain::getCase(size_t indice)
 {
     //  comparison of unsigned expression < 0 is always false
     if ( indice >= cases.size() ) {
         throw std::logic_error("Tentative de lire a un indice invalide dans Terrain.cases");
     }
-    return cases[indice];
+    return cases.at(indice);
 }
 
-Case& Terrain::getCase(Point3 coord)
+ Case& Terrain::getCase(Point3 coord)
 {
     if ( ! contains(mapPoint3ToIndice,coord) ) {
         throw std::logic_error("Tentative de lire une case dont les coordonnées ne sont pas dans la map de coordonnées");
     }
 
-    return cases[mapPoint3ToIndice[coord]];
+    return cases.at(mapPoint3ToIndice[coord]);
 }
 
 
@@ -122,16 +123,6 @@ void Terrain::test()
         using namespace std;
         Terrain terrain; // constructeur par defaut
 
-        auto erreur = [&](std::string msg){
-            cout << "\n Erreur : " << msg << endl;
-        };
-        auto test = [&] (bool condition, std::string msg)
-        {
-            if ( ! condition )
-            {
-                erreur(msg);
-            }
-        };
         cout << "Debut validation calcul point voisin par defaut " << endl;
         std::vector<Point3> pointsVoisinsTheorique, pointsVoisinsReel ;
         pointsVoisinsTheorique.push_back(Point3(1,0,0));
@@ -144,16 +135,16 @@ void Terrain::test()
         pointsVoisinsTheorique.push_back(Point3(0,0,-1));
         pointsVoisinsReel = terrain.calculeVoisins(Point3(0,0,0));
 
-        test( pointsVoisinsReel.size() == pointsVoisinsTheorique.size(),
+        testUnitaire( pointsVoisinsReel.size() == pointsVoisinsTheorique.size(),
               "calcul voisin donne " +  std_fix::to_string(pointsVoisinsReel.size()) + " au lieu de " +  std_fix::to_string(pointsVoisinsTheorique.size()) );
 
         for (auto& p : pointsVoisinsReel)
         {
-            test ( contains(pointsVoisinsTheorique,p) , ""+p+" n'est pas dans les points voisins théoriques" );
+            testUnitaire ( contains(pointsVoisinsTheorique,p) , ""+p+" n'est pas dans les points voisins théoriques" );
         }
         for (auto& p :pointsVoisinsTheorique)
         {
-            test ( contains(pointsVoisinsReel,p), ""+p + " n'a pas etait trouvé par la recherche de voisin" );
+            testUnitaire ( contains(pointsVoisinsReel,p), ""+p + " n'a pas etait trouvé par la recherche de voisin" );
         }
 
         cout << "Debut validation add case " << endl;
@@ -163,51 +154,51 @@ void Terrain::test()
         terrain.addCase(Point3(0,0,1));
         terrain.addCase(Point3(1,1,1));
         // on vérifie que les cases sont bien ajouté dans le vec de case
-        test (terrain.cases.size() == 5, "la taille du vec de cases est de " + std_fix::to_string(terrain.cases.size()) +" au lieux d'etre de 5");
+        testUnitaire (terrain.cases.size() == 5, "la taille du vec de cases est de " + std_fix::to_string(terrain.cases.size()) +" au lieux d'etre de 5");
 
         // on vérifie l'echec d'un ajout sur une case existante
         bool execptionLevee = false;
         try { terrain.addCase(Point2(0,0)); }
         catch (...) {execptionLevee = true;}
-        test (execptionLevee, "le double ajout de (0,0) n'a pas levé d'execption ");
+        testUnitaire (execptionLevee, "le double ajout de (0,0) n'a pas levé d'execption ");
 
         Case& case00 = terrain.getCase(1);
-        test ( case00.voisins.size() == 2 , "La case 00 devrait avoir 2 voisins");
+        testUnitaire ( case00.voisins.size() == 2 , "La case 00 devrait avoir 2 voisins");
 
         Case& case101 = terrain.getCase(Point3(1,0,1));
-        test ( case101.voisins.size() == 3 , "La case101 devrait avoir 3 voisin");
+        testUnitaire ( case101.voisins.size() == 3 , "La case101 devrait avoir 3 voisin");
 
         Case& case111 = terrain.getCase(Point3(1,1,1));
-        test ( case111.voisins.size() == 1 , "La case111 devrait avoir 1 voisin");
+        testUnitaire ( case111.voisins.size() == 1 , "La case111 devrait avoir 1 voisin");
 
         cout << "Un petit test sur la cohérence des deux getCase " <<endl;
         for (auto& paire : terrain.mapPoint3ToIndice )
         {
             auto coord = paire.first;
             int indice = terrain.mapPoint3ToIndice[coord];
-            test ( terrain.getCase(indice) == terrain.getCase(coord) , " le getCase indice et coord ne sont pas cohérent "+ std_fix::to_string(indice) + coord );
+            testUnitaire ( terrain.getCase(indice) == terrain.getCase(coord) , " le getCase indice et coord ne sont pas cohérent "+ std_fix::to_string(indice) + coord );
 
         }
 
         cout << "Test de suppression de case" << endl;
-        test ( terrain.getIndice(terrain.getCase(Point2(0,0)))== 0 , "Tu as chier ton test");
+        testUnitaire ( terrain.getIndice(terrain.getCase(Point2(0,0)))== 0 , "Tu as chier ton test");
         terrain.removeCase(Point2(1,0));
         size_t indice = terrain.getIndice(terrain.getCase(Point3(1,0,1)));
-        test ( indice == 1,  "Les cases apres la suppression doivent etre un crans plus bas doit etre : 1 est :"+  std_fix::to_string(indice));
+        testUnitaire ( indice == 1,  "Les cases apres la suppression doivent etre un crans plus bas doit etre : 1 est :"+  std_fix::to_string(indice));
         indice = terrain.getIndice(terrain.getCase(Point3(0,0,1)));
-        test ( indice == 2,   "Les cases apres la suppression doivent etre un crans plus bas doit etre : 2 est :"+  std_fix::to_string( indice));
+        testUnitaire ( indice == 2,   "Les cases apres la suppression doivent etre un crans plus bas doit etre : 2 est :"+  std_fix::to_string( indice));
         indice =  terrain.getIndice(terrain.getCase(Point3(1,1,1)));
-        test ( indice== 3, "Les cases apres la suppression doivent etre un crans plus bas doit etre : 3 est :"+  std_fix::to_string( indice));
+        testUnitaire ( indice== 3, "Les cases apres la suppression doivent etre un crans plus bas doit etre : 3 est :"+  std_fix::to_string( indice));
 
         execptionLevee = false;
         try {terrain.getCase(Point3(1,0,0));}
         catch (...) {execptionLevee = true;}
-        test (execptionLevee, "On ne devrait pas pouvoir aller à la case qui a etait delete ");
+        testUnitaire (execptionLevee, "On ne devrait pas pouvoir aller à la case qui a etait delete ");
 
         execptionLevee = false;
         try {terrain.getCase(4);}
         catch (...) {execptionLevee = true;}
-        test (execptionLevee, "On ne devrait pas pouvoir aller a l'indice 4 (taille du vecteur : " + std_fix::to_string(terrain.cases.size()));
+        testUnitaire (execptionLevee, "On ne devrait pas pouvoir aller a l'indice 4 (taille du vecteur : " + std_fix::to_string(terrain.cases.size()));
     #endif
 }
 
