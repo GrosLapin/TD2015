@@ -97,6 +97,7 @@ class Dijkstra{
             throw std::logic_error("Indice hors tableau dans le calcul de chemin");
         }
     }
+
     inline void synchronisationWithTerrain()
     {
         cases.clear();
