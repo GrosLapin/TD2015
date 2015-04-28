@@ -1,0 +1,19 @@
+#ifndef TEST_HPP
+#define TEST_HPP
+
+#include<iostream>
+#include "fonctionTest/test.hpp"
+
+void erreur (const std::string& msg){
+    throw FailTestError("Erreur : " + msg );
+};
+       
+void test (bool condition, std::string msg)
+{
+    if ( ! condition )
+    {
+        erreur(msg);
+    }
+};
+
+#endif
