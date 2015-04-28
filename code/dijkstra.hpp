@@ -7,8 +7,10 @@
 
 #include "terrain.hpp"
 #include "fonctionTest/test.hpp"
-// Version vraiment pas modulable :D
+#include "illegalArgumentError.hpp"
 
+// Version vraiment pas modulable :D
+/// Il faut integer indice debut(ou actuel) et indice fin dans la classe.
 class Dijkstra{
 
     static const int infranchissable = std::numeric_limits<int>::max();
@@ -21,11 +23,14 @@ class Dijkstra{
         CaseDistance (const Case& c) :laCase(c),  distance(notVisited) {}
     };
 
-    // Le terrain et Dijkstra on le meme ordre de case ce qui vos nous simplifier grandement la vie
-    const Terrain& terrain;
+    // Le terrain et Dijkstra on le meme ordre de case ce qui va nous simplifier grandement la vie
+    Terrain& terrain;
     bool aVerifier;
     std::vector<CaseDistance> cases;
-    std::vector<std::size_t> indiceChemin;
+    std::vector<std::size_t> indiceChemin; // indiceChemin.front() == indice de la case ou on souhaite aller
+
+
+    // retourne la distance la plus petites parmis les distances de ces voisins
     int distanceVoisinMin (CaseDistance& uneCaseDistance)
     {
         if (! uneCaseDistance.laCase.haveVoisins()) {
@@ -43,30 +48,14 @@ class Dijkstra{
         }
         return min;
     }
-    size_t indiceVoisinDistanceMin(CaseDistance& uneCaseDistance)
-    {
-        if ( ! uneCaseDistance.laCase.haveVoisins()) {
-            throw std::logic_error("indiceVoisinDistanceMin : Recherche d'un voisin sur une cases sans voisin: "
-                + std_fix::to_string(uneCaseDistance.laCase.getCoordonnees()));
-        }
-        size_t indice = uneCaseDistance.laCase.getIndice();
-        int min = infranchissable;
-        for (const size_t& voisin : uneCaseDistance.laCase )
-        {
-            int distanceVoisin = cases[voisin].distance;
-            if ( min > distanceVoisin )
-            {
-                min = distanceVoisin;
-                indice = cases[voisin].laCase.getIndice();
-            }
-        }
-        return indice;
-    }
 
+    // calcul l'indice de la case suivante, en suposant que la case actuelle a déja le bon indice.
+    // ce qui veut dire qu'on a juste a chercher la case ayant le distance la plus petite parmis les distance plus grand que celle
+    // de cette case
     size_t indiceCaseSuivanteDansChemin(CaseDistance& uneCaseDistance)
     {
         if ( ! uneCaseDistance.laCase.haveVoisins()) {
-            throw std::logic_error("indiceVoisinDistanceMin : Recherche d'un voisin sur une cases sans voisin: "
+            throw std::logic_error("indiceCaseSuivanteDansChemin : Recherche d'un voisin sur une cases sans voisin: "
                 + std_fix::to_string(uneCaseDistance.laCase.getCoordonnees()));
         }
         size_t indice = uneCaseDistance.laCase.getIndice();
@@ -94,7 +83,7 @@ class Dijkstra{
         // vérification
         if ( indiceDebut >= cases.size() || indiceFin >= cases.size() )
         {
-            throw std::logic_error("Indice hors tableau dans le calcul de chemin");
+            throw IllegalArgumentError("Indice hors tableau dans le calcul de chemin");
         }
     }
 
@@ -108,6 +97,10 @@ class Dijkstra{
     }
 
     public :
+
+    bool operator == (const Dijkstra& other ) const { return &other == this; };
+    bool operator != (const Dijkstra& other ) const { return !operator==(other); };
+
     static void test (){
         using namespace std;
         Terrain terrain;
@@ -141,6 +134,8 @@ class Dijkstra{
         testUnitaire((indiceNext == indiceSolution1 || indiceNext == indiceSolution2), "La case suivante doit etre 0,1 ou 1,0");
         testUnitaire(dij.indiceChemin.size() == 8, "Le chemin dois se faire en 8 coups pas en " + std_fix::to_string(dij.indiceChemin.size()));
         cout << "fin test dijkstra" << endl;
+
+        Dijkstra test = std::move(dij);
 
     }
     size_t indiceProchaineCase(size_t indiceDebut, size_t indiceFin ) {
@@ -179,9 +174,9 @@ class Dijkstra{
         indiceChemin.push_back(indiceFin);
         while(cases[indiceChemin.back()].laCase.getIndice() != indiceDebut)
         {
-            std::cout << cases[indiceChemin.back()].laCase.getCoordonnees() << " distance : "<<cases[indiceChemin.back()].distance <<std::endl;
+            //std::cout << cases[indiceChemin.back()].laCase.getCoordonnees() << " distance : "<<cases[indiceChemin.back()].distance <<std::endl;
             int indice = indiceCaseSuivanteDansChemin(cases[indiceChemin.back()]);
-            std::cout << cases[indice].laCase.getCoordonnees() << " distance : "<<cases[indice].distance  <<std::endl;
+            //std::cout << cases[indice].laCase.getCoordonnees() << " distance : "<<cases[indice].distance  <<std::endl;
             indiceChemin.push_back(indiceCaseSuivanteDansChemin(cases[indiceChemin.back()]));
 
         }
@@ -216,11 +211,29 @@ class Dijkstra{
             }
         }
     }
-    Dijkstra(const Terrain& leTerrain) : terrain(leTerrain), aVerifier(true){
 
+    Dijkstra(Terrain& leTerrain) : terrain(leTerrain), aVerifier(true){
+        terrain.addDijkstra(*this);
+    }
+
+    Dijkstra(const Dijkstra& dij) : terrain(dij.terrain),
+                                    aVerifier(dij.aVerifier),
+                                    cases(dij.cases.begin(), dij.cases.end()),
+                                    indiceChemin(dij.indiceChemin.begin(), dij.indiceChemin.end())
+    {
+
+        terrain.addDijkstra(*this);
     }
 
 
+    virtual ~Dijkstra() {
+        terrain.removeDijkstra(*this);
+    }
+
+
+    ///Version naive, on recalcul tout.
+    void addCase(const Case& uneCase) { aVerifier = true; }
+    void removeCase(const Case& uneCase) { aVerifier = true; }
 };
 
 #endif // DIJKSTRA_HPP

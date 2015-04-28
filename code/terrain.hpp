@@ -65,6 +65,7 @@ namespace boost {
 
 inline Point3 point3to2 (Point2 p2) { return Point3(p2.get<0>(),p2.get<1>(),0); }
 class Case;
+class Dijkstra;
 
  inline std::vector<Point3> calculeVoisinsExa (Point3 point) {
     std::vector<Point3> retour;
@@ -93,6 +94,7 @@ class Terrain
 
         bool operator == (const Terrain& other ) const { return &other == this; };
         bool operator != (const Terrain& other ) const { return !operator==(other); };
+
         Terrain( std::function<std::vector<Point3>(Point3 point)> leCalculDesVoisins = calculeVoisinsExa ) : calculeVoisins(leCalculDesVoisins) {}
 
 
@@ -109,26 +111,30 @@ class Terrain
         // Le parcourt des cases
         using iterator = std::vector<Case>::iterator;
         using const_iterator = std::vector<Case>::const_iterator;
-
         inline iterator begin() { return cases.begin(); }
         inline const_iterator begin() const { return cases.begin(); }
-
         inline iterator end() { return cases.end(); }
         inline const_iterator end() const{ return cases.end(); }
 
+
+        // la gestion des cases
         void addCase (Point3 coord);
         inline void addCase (int x, int y, int z = 0) {addCase(Point3(x,y,z)); }
         inline void addCase (Point2 coord) { addCase(point3to2(coord)); }
-
         void removeCase(Point3 coord);
         inline void removeCase(Point2 coord) { removeCase(point3to2(coord)); }
+
+        // la gestion des dijkstra
+        void addDijkstra( Dijkstra& dij);
+        void removeDijkstra( Dijkstra& dij);
 
         void static test();
     private :
         // il me faut un map pour faire le liens entre une "Point3" et l'indice dans laquelle est stoqué la case
         std::map<Point3,size_t> mapPoint3ToIndice;
         std::vector<Case> cases;
-
+        // sert à maintenir a jours les dijkras qui sont liée à ce terrain.
+        std::vector<std::reference_wrapper<Dijkstra>> vecRefDijkstra;
         // l'utilisation d'une fonction nous permet d'avoir la modularité de l'héritage sans la lourdeur de celle-ci
         std::function<std::vector<Point3> (Point3 point)> calculeVoisins;
 

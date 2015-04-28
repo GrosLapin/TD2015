@@ -1,7 +1,22 @@
 #include "terrain.hpp"
 #include "case.hpp"
 #include "fonctionTest/test.hpp"
+#include "illegalArgumentError.hpp"
+#include "dijkstra.hpp"
 
+void Terrain::addDijkstra( Dijkstra& dij)
+{
+    vecRefDijkstra.push_back(std::ref(dij));
+}
+
+void Terrain::removeDijkstra( Dijkstra& dij)
+{
+    auto it = std::find(vecRefDijkstra.begin(),vecRefDijkstra.end(),std::ref(dij));
+    if (it == vecRefDijkstra.end() ) {
+        throw IllegalArgumentError("Suprresion d'un dijkstra qui n'est pas dans ce terrain");
+    }
+    vecRefDijkstra.erase(it);
+}
 int Terrain::getIndice(const Case& uneCase) const
 {
     // AVANT : if ( ! contains (cases,uneCase) )  => est-ce equivalant ?
@@ -70,6 +85,12 @@ void Terrain::addCase (Point3 coord)
             nouvelleCase.addVoisin(mapPoint3ToIndice[point]);
         }
     }
+
+    // 4 ) on mets a jours tous les dijkstra
+    for (auto& refDij : vecRefDijkstra )
+    {
+        refDij.get().addCase(nouvelleCase);
+    }
 };
 
 void Terrain::removeCase(Point3 coord)
@@ -80,6 +101,12 @@ void Terrain::removeCase(Point3 coord)
         // 1) chopé une ref sur la case a supprimer
         size_t indice = mapPoint3ToIndice[coord];
         Case& aDelete = cases[indice];
+
+        //1.5) Mettre à jours les dijsktra
+        for (auto& refDij : vecRefDijkstra )
+        {
+            refDij.get().removeCase(aDelete);
+        }
 
         // 2) trouver tout ces voisins dans la grille
         std::vector<Point3> voisinsPotentiels = calculeVoisins (coord);
