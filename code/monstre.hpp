@@ -5,24 +5,31 @@
 \class Monstre
 
 */
-
+#include<iostream>
 class Monstre
 {
     public :
+        Monstre(std::size_t vie_, std::size_t vitesse_) : vie(vie_), vitesse(vitesse_) {}
+        Monstre(const Monstre& monstre) : vie(monstre.vie), vitesse(monstre.vitesse) {}
 
-    Monstre(auto vie_, auto vitesse_);
-    Monstre(auto monstre);
-    ~Monstre();
+        inline void perdreVie(const std::size_t degats)
+        {
+            if ( vie < degats )
+            {
+                delete this;
+            }
+            else
+            {
+                vie -= degats;
+            }
+        }
 
-    inline void perdreVie(const auto degats);
-
-    auto getVie() const;
-    auto getVitesse() const;
+        std::size_t getVie() const { return vie; }
+        std::size_t getVitesse() const{ return vitesse; }
 
     private :
-
-    size_t vie;
-    size_t vitesse;
+        std::size_t vie;
+        std::size_t vitesse;
 };
 
 #endif // MONSTRE_HPP_INCLUDED

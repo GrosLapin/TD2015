@@ -6,11 +6,11 @@
 class Tourelle
 {
     public :
-    Tourelle(auto degatsAttaque_, auto case_);
-    Tourelle(auto tour, auto case_);
+    Tourelle(size_t degatsAttaque_, Case& case_) : degatsAttauque(degatsAttaque_), saCase(case_) {}
+    Tourelle(const Tourelle& tour) : degatsAttaque(tour.degatsAttaque),saCase(tour.saCase) {}
 
-    auto getDegatsAttaque() const;
-    auto& getCase();
+    auto getDegatsAttaque() const { return degatsAttaque; }
+    auto& getCase(){ return saCase; }
 
     private :
     size_t degatsAttaque;
