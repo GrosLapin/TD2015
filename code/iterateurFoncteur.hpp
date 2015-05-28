@@ -44,7 +44,7 @@ class FoncteurIterator
 
         // les méthodes ou on fait rien de particulier
         bool operator!=(FoncteurIterator &i2) const { return iterateur != i2.iterateur; }
-        void operator++() { iterateur++; }
+        FoncteurIterator<IteratorTemplate,FoncteurTemplate>& operator++() { iterateur++; return *this; }
         void operator+=(int b) { iterateur += b; }
         decltype(IteratorTemplate()-IteratorTemplate()) operator-(const FoncteurIterator &i2) const { return iterateur - i2.iterateur; }
 

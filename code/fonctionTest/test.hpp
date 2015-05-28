@@ -6,7 +6,7 @@
 
 inline void erreur (const std::string& msg){
     throw FailTestError("Erreur : " + msg );
-};
+}
 
 inline void testUnitaire (bool condition,const std::string& msg)
 {
@@ -14,6 +14,6 @@ inline void testUnitaire (bool condition,const std::string& msg)
     {
         erreur(msg);
     }
-};
+}
 
 #endif

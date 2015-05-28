@@ -17,11 +17,13 @@ public :
     public :
 
     /// Je suis pas sur de moi, mais j'ai l'impression qu'autoriser la copie peut nous mettre dedans
-        Case ( Case && quiVaMourir) : refTerrain(quiVaMourir.refTerrain){
-            voisins = std::move(quiVaMourir.voisins);
-            indice = std::move(quiVaMourir.indice);
-            coordonnees = std::move(quiVaMourir.coordonnees);
-        }
+        Case ( Case && quiVaMourir) :
+            coordonnees (std::move(quiVaMourir.coordonnees)),
+            indice ( std::move(quiVaMourir.indice)),
+            refTerrain(quiVaMourir.refTerrain),
+            voisins ( std::move(quiVaMourir.voisins))
+        {}
+
         Case & operator= ( Case && quiVaMourir ) {
             refTerrain = quiVaMourir.refTerrain;
             voisins = std::move(quiVaMourir.voisins);
@@ -46,39 +48,39 @@ public :
     inline void addVoisin(Case& voisin)
     {
         // On passe la main à la fonction qui prend un int
-        int indice = refTerrain.get().getIndice(voisin);
-        addVoisin(indice);
+        int indiceVoisin = refTerrain.get().getIndice(voisin);
+        addVoisin(indiceVoisin);
     };
-    inline void addVoisin(size_t indice)
+    inline void addVoisin(size_t indiceVoisin)
     {
         size_t notreIndice = refTerrain.get().getIndice(*this);
 
         // vérification d'usage
-        if ( indice == notreIndice ) {
+        if ( indiceVoisin == notreIndice ) {
             throw std::logic_error("Une case ne peut pas etre un de ses voisins");
         }
 
-        if ( contains(voisins,indice)) {
+        if ( contains(voisins,indiceVoisin)) {
             throw std::logic_error("Ajout d'un voisin deja présent dans la liste des voisins");
         }
 
         // 1) on reconnait cette case comme un voisin
-        voisins.push_back(indice) ;
+        voisins.push_back(indiceVoisin) ;
         // 2) le voisin aussi
-        Case& voisin =refTerrain.get().getCase(indice);
+        Case& voisin =refTerrain.get().getCase(indiceVoisin);
         voisin.voisins.push_back(notreIndice);
     }
 
     inline void removeVoisin(Case& voisin)
     {
         // On passe la main à la fonction qui prend un int
-        size_t indice = refTerrain.get().getIndice(voisin);
-        removeVoisin(indice);
+        size_t indiceVoisin = refTerrain.get().getIndice(voisin);
+        removeVoisin(indiceVoisin);
     }
-    inline void removeVoisin(size_t indice)
+    inline void removeVoisin(size_t indiceVoisin)
     {
         // Dans un sens
-        auto position = std::find(voisins.begin(),voisins.end(),indice);
+        auto position = std::find(voisins.begin(),voisins.end(),indiceVoisin);
         if ( position != voisins.end())
         {
             voisins.erase(position);
@@ -86,15 +88,14 @@ public :
 
         // et dans l'autre
         size_t notreIndice = refTerrain.get().getIndice(*this);
-        Case& voisin = refTerrain.get().getCase(indice);
+        Case& voisin = refTerrain.get().getCase(indiceVoisin);
 
         position = std::find(voisin.voisins.begin(),voisin.voisins.end(),notreIndice);
         if ( position != voisin.voisins.end())
         {
             voisin.voisins.erase(position);
         }
-
-    };
+    }
 
     /// TODO : reflechir si on veut iterer sur les indices ou sur les cases
     // using iterator = FoncteurIterator<std::vector<std::reference_wrapper<Case>>::iterator,indiceToCase>;
@@ -110,15 +111,17 @@ public :
         friend class Terrain ;    // je veux que : Terrain puisse me tester
         // je veux que le terrain soit le seul a créer des cases.
         Case(Terrain& unTerrain,size_t id,Point3 coord) :
-            refTerrain(unTerrain) ,
+            coordonnees(coord),
             indice(id),
-            coordonnees(coord)
+            refTerrain(unTerrain) ,
+            voisins()
             {}
 
-        std::vector<std::size_t> voisins;
-        std::reference_wrapper<Terrain> refTerrain;
-        size_t indice;
         Point3 coordonnees;
+        size_t indice;
+        std::reference_wrapper<Terrain> refTerrain;
+        std::vector<std::size_t> voisins;
+
 };
 
 
