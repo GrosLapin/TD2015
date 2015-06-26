@@ -4,8 +4,7 @@
 #include <functional>
 #include <algorithm>
 
-#include "dijkstra.hpp"
-
+#include "metier/dijkstra.hpp"
 
 /**
 \bug Ca serait bien puisque la case est lié au terrain qu'elle connaisse ses coordonnée ...

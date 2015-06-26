@@ -1,7 +1,7 @@
 #include "terrain.hpp"
 #include "case.hpp"
-#include "fonctionTest/test.hpp"
-#include "illegalArgumentError.hpp"
+#include "../utilitaire/fonctionTest/test.hpp"
+#include "../utilitaire/illegalArgumentError.hpp"
 #include "dijkstra.hpp"
 
 void Terrain::addDijkstra( Dijkstra& dij)

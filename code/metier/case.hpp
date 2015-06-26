@@ -4,8 +4,8 @@
 #include <functional>
 #include <algorithm>
 
-#include "iterateurFoncteur.hpp"
-#include "fonctionsConteneur.hpp"
+#include "../utilitaire/iterateurFoncteur.hpp"
+#include "../utilitaire/fonctionsConteneur.hpp"
 #include "terrain.hpp"
 /**
 \bug Ca serait bien puisque la case est lié au terrain qu'elle connaisse ses coordonnée ...

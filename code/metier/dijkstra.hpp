@@ -7,8 +7,8 @@
 
 #include "terrain.hpp"
 #include "case.hpp"
-#include "fonctionTest/test.hpp"
-#include "illegalArgumentError.hpp"
+#include "../utilitaire/fonctionTest/test.hpp"
+#include "../utilitaire/illegalArgumentError.hpp"
 
 // Version vraiment pas modulable :D
 /// Il faut integer indice debut(ou actuel) et indice fin dans la classe.
@@ -89,7 +89,7 @@ class Dijkstra{
         }
     }
 
-    Dijkstra(Terrain& leTerrain) : terrain(leTerrain), aVerifier(true){
+    Dijkstra(Terrain& leTerrain) : terrain(leTerrain), aVerifier(true), cases(), indiceChemin() {
         terrain.addDijkstra(*this);
     }
 
@@ -107,10 +107,10 @@ class Dijkstra{
         terrain.removeDijkstra(*this);
     }
 
-
     ///Version naive, on recalcul tout.
     void addCase(const Case& uneCase) { aVerifier = true; }
     void removeCase(const Case& uneCase) { aVerifier = true; }
+
 
     private :
     friend class TestClass;
