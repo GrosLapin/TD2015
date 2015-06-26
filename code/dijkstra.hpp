@@ -55,11 +55,7 @@ class Dijkstra{
         indiceChemin.push_back(indiceFin);
         while(cases[indiceChemin.back()].laCase.getIndice() != indiceDebut)
         {
-            //std::cout << cases[indiceChemin.back()].laCase.getCoordonnees() << " distance : "<<cases[indiceChemin.back()].distance <<std::endl;
-            int indice = indiceCaseSuivanteDansChemin(cases[indiceChemin.back()]);
-            //std::cout << cases[indice].laCase.getCoordonnees() << " distance : "<<cases[indice].distance  <<std::endl;
-            indiceChemin.push_back(indice);
-
+            indiceChemin.push_back(indiceCaseSuivanteDansChemin(cases[indiceChemin.back()]));
         }
 
         /// A vérifier mais à priorie on veut pas que le debut soit dans le chemin

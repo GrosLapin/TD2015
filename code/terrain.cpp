@@ -91,7 +91,7 @@ void Terrain::addCase (Point3 coord)
     {
         refDij.get().addCase(nouvelleCase);
     }
-};
+}
 
 void Terrain::removeCase(Point3 coord)
 {

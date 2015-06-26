@@ -95,8 +95,11 @@ class Terrain
         bool operator == (const Terrain& other ) const { return &other == this; };
         bool operator != (const Terrain& other ) const { return !operator==(other); };
 
-        Terrain( std::function<std::vector<Point3>(Point3 point)> leCalculDesVoisins = calculeVoisinsExa ) : calculeVoisins(leCalculDesVoisins) {}
-
+        Terrain( std::function<std::vector<Point3>(Point3 point)> leCalculDesVoisins = calculeVoisinsExa )
+        :   mapPoint3ToIndice(),
+            cases(),
+            vecRefDijkstra(),
+            calculeVoisins(leCalculDesVoisins) {}
 
         int getIndice(const Case& uneCase) const ;
         // devrait etre const mais j'arrive pas a l'ecrire
