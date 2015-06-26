@@ -6,15 +6,15 @@
 class Tourelle
 {
     public :
-    Tourelle(size_t degatsAttaque_, Case& case_) : degatsAttaque(degatsAttaque_), saCase(case_) {}
+    Tourelle(size_t degatsAttaque_, int case_) : degatsAttaque(degatsAttaque_), saCase(case_) {}
     Tourelle(const Tourelle& tour) : degatsAttaque(tour.degatsAttaque),saCase(tour.saCase) {}
 
     size_t getDegatsAttaque() const { return degatsAttaque; }
-    Case& getCase(){ return saCase; }
+    int getCase(){ return saCase; }
 
     private :
     size_t degatsAttaque;
-    Case& saCase;
+    int saCase;
 };
 
 #endif // TOURELLE_HPP_INCLUDED
