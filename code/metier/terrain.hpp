@@ -114,10 +114,10 @@ class Terrain
         // Le parcourt des cases
         using iterator = std::vector<Case>::iterator;
         using const_iterator = std::vector<Case>::const_iterator;
-        inline iterator begin() { return cases.begin(); }
+        inline iterator begin()             { return cases.begin(); }
         inline const_iterator begin() const { return cases.begin(); }
-        inline iterator end() { return cases.end(); }
-        inline const_iterator end() const{ return cases.end(); }
+        inline iterator end()               { return cases.end(); }
+        inline const_iterator end() const   { return cases.end(); }
 
 
         // la gestion des cases

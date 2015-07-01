@@ -2,7 +2,7 @@
 
 #include "utilitaire/fonctionTest/test.hpp"
 #include "testClass.hpp"
-
+#include "exemple/exemple_iterateurFoncteur.hpp"
 
 /**
 \file main.cpp
@@ -11,10 +11,13 @@
 \bug Soon :D
 */
 
+#include "testPourLeDev.hpp"
 using namespace std;
 
 
 int main ()
 {
-    TestClass t;
+
+    TestClass::testDijkstra();
+
 }
