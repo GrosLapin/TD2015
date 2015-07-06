@@ -2,7 +2,7 @@
 #define ITERATEUR_FONCTEUR_HPP
 
 #include <functional>
-
+#include "paramInfo.hpp"
 
 
 /**
@@ -65,7 +65,8 @@ class FoncteurIterator
 
      private :
         using typeDeRetour = decltype(std::declval<FoncteurTemplate>()(*(IteratorTemplate())));
-        using typeDuParam  = typename IteratorTemplate::value_type&;
+        //using typeDeRetour = decltype(typeRetour(std::declval<FoncteurTemplate>()));
+        using typeDuParam  = decltype(typeParam<0>(std::declval<FoncteurTemplate>()));
 
         IteratorTemplate iterateur;
         std::function<typeDeRetour (typeDuParam ) > foncteur;
