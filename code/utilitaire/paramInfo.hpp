@@ -5,6 +5,7 @@
 #include <iostream>
 #include <tuple>
 
+
 template <class... T>
 class ERREUR;
 
@@ -14,92 +15,87 @@ struct informationParam{
     ERREUR<LeParamNestPasUneFonction> erreur;
 };
 
+
+template<class ReturnType, class ... Args>
+struct informationParamParamFactorisation
+{
+    constexpr static size_t arity = sizeof...(Args);
+    using  result_type = ReturnType;
+
+    template <size_t indice>
+    struct arg_type_
+    {
+        static_assert ((indice < arity ), "La fonction à moins de param que ce que vous demandez" );
+        using type= typename std::tuple_element<indice, std::tuple<Args...>>::type;
+
+    };
+    template <size_t i> using arg_type = typename arg_type_<i>::type;
+};
+
 // operateur () PAS !!! const
 template <typename ClassType, typename ReturnType, typename... Args>
 struct informationParam<ReturnType(ClassType::*)(Args...) >
 {
-    constexpr static size_t arity = sizeof...(Args);
-    using  result_type = ReturnType;
-    // je suis obligué de passer par une struct, si non je sais pas faire le static assert sur le using
-    template <size_t i>
-    struct arg
-    {
-        static_assert ((i < arity ), "La fonction à moins de param que ce que vous demandez" );
-        using leType =  typename std::tuple_element<i, std::tuple<Args...>>::type ;
-    };
-    template <size_t i> using type = typename arg<i>::leType;
+    using type = informationParamParamFactorisation<ReturnType,Args...>;
 };
 
 // operateur () const
 template <typename ClassType, typename ReturnType, typename... Args>
 struct informationParam<ReturnType(ClassType::*)(Args...) const>
 {
-    constexpr static size_t arity = sizeof...(Args);
-    using  result_type = ReturnType;
-    // je suis obligué de passer par une struct, si non je sais pas faire le static assert sur le using
-    template <size_t i>
-    struct arg
-    {
-        static_assert ((i < arity ), "La fonction à moins de param que ce que vous demandez" );
-        using leType =  typename std::tuple_element<i, std::tuple<Args...>>::type ;
-    };
-    template <size_t i> using type = typename arg<i>::leType;
+   using type = informationParamParamFactorisation<ReturnType,Args...>;
 };
 
 // pointeur de fonction
 template < typename ReturnType, typename... Args>
 struct informationParam<ReturnType(*)(Args...)>
 {
-    constexpr static size_t arity = sizeof...(Args);
-    using  result_type = ReturnType;
-    // je suis obligué de passer par une struct, si non je sais pas faire le static assert sur le using
-    template <size_t i>
-    struct arg
-    {
-        static_assert ((i < arity ), "La fonction à moins de param que ce que vous demandez" );
-        using leType =  typename std::tuple_element<i, std::tuple<Args...>>::type ;
-    };
-    template <size_t i> using type = typename arg<i>::leType;
+    using type = informationParamParamFactorisation<ReturnType,Args...>;
 };
+
 
 
 template    <
                 class T,
                 class U = typename std::enable_if < ! std::is_class<T>::value >::type
             >
-informationParam<T> getInformationParam (T t);/*
-{
-    // normalement j'ai pas besoin (ni envie d'avoir un corps de fonction mais ça sert pour les debugs
-    std::cout << "fonction" << std::endl;
-    return informationParam<T>();
-}*/
+informationParam<T> getInformationParam (T t);
 
 template <class T>
-informationParam<decltype(&T::operator())> getInformationParam (T t);/*
-{
-    // normalement j'ai pas besoin (ni envie d'avoir un corps de fonction mais ça sert pour les debugs
-    std::cout << "class" << std::endl;
-
-    return informationParam<decltype(&T::operator())>();
-}
-*/
+informationParam<decltype(&T::operator())> getInformationParam (T t);
 
 
+/**
+    Les methodes pour l'utilisation simple de ce qu'il y a avant toujours avec 2 ecritures possible
+
+    nbParam(x); // utile pour les lambda et les pointeurs de fonction
+    nbParam<X>();//utile pour les classes foncteurs
+
+**/
 template<class T>
 constexpr size_t nbParam(T fonction)
 {
-    return decltype(getInformationParam(fonction))::arity;
+    // si ça plante ici c'est que ta classe elle a pas d'operateur () , noob
+    return decltype(getInformationParam(fonction))::type::arity;
+}
+template<class T> constexpr size_t nbParam()
+{
+    // si ça plante ici c'est que ta classe elle a pas d'operateur () , noob
+    return decltype(getInformationParam(std::declval<T>()))::type::arity;
 }
 
 template<size_t nb,class T>
-constexpr typename decltype(getInformationParam(std::declval<T>()))::template type<nb> typeParam(T fonction );
+constexpr typename decltype(getInformationParam(std::declval<T>()))::type::template arg_type<nb> typeParam(T fonction );
+
+template<size_t nb,class T>
+constexpr typename decltype(getInformationParam(std::declval<T>()))::type::template arg_type<nb> typeParam();
 
 
 template<class T>
-constexpr typename decltype(getInformationParam(std::declval<T>()))::result_type typeRetour(T fonction );
+constexpr typename decltype(getInformationParam(std::declval<T>()))::type::result_type typeRetour(T fonction );
 
-
-
+template<class T>
+constexpr typename decltype(getInformationParam(std::declval<T>()))::type::result_type typeRetour( );
 
 #endif
 

@@ -3,6 +3,7 @@
 #include "utilitaire/fonctionTest/test.hpp"
 #include "testClass.hpp"
 #include "exemple/exemple_iterateurFoncteur.hpp"
+#include "exemple/exemple_paramInfo.hpp"
 
 /**
 \file main.cpp
@@ -20,5 +21,6 @@ int main ()
 
     TestClass::testDijkstra();
     exempleIterateurFoncteur();
+    exempleParamInfo();
 
 }
