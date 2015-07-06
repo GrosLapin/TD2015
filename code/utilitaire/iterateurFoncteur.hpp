@@ -64,8 +64,7 @@ class FoncteurIterator
     static_assert(is_iterator<IteratorTemplate>::value,"Le type T doit etre un itérateur");
 
      private :
-        using typeDeRetour = decltype(std::declval<FoncteurTemplate>()(*(IteratorTemplate())));
-        //using typeDeRetour = decltype(typeRetour(std::declval<FoncteurTemplate>()));
+        using typeDeRetour = decltype(typeRetour(std::declval<FoncteurTemplate>()));
         using typeDuParam  = decltype(typeParam<0>(std::declval<FoncteurTemplate>()));
 
         IteratorTemplate iterateur;

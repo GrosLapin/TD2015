@@ -5,10 +5,6 @@
 #include <iostream>
 #include <tuple>
 
-
-template <class... T>
-class TD;
-
 template <class... T>
 class ERREUR;
 
