@@ -1,0 +1,6 @@
+[submodule "code/hopp"]
+	path = code/hopp
+	url = https://gitlab.com/hnc/hopp
+[submodule "code/thoth"]
+	path = code/thoth
+	url = https://gitlab.com/hnc/thoth.git
